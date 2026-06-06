@@ -56,7 +56,8 @@
         {{-- 4. Warna / Dekor --}}
         <div class="form-row" id="warnaRow">
           <label class="form-label" for="tentColor">Warna / Dekor Tenda</label>
-          <select class="form-select" id="tentColor" onchange="hitungHarga()"></select>
+          <select class="form-select" id="tentColor" onchange="hitungHarga()" style="display:none;"></select>
+          <input type="hidden" id="selectedColorValue" value="">
         </div>
 
         {{-- 5. Pilihan Kursi --}}
@@ -119,8 +120,9 @@
           <div class="result-price" id="totalPrice">Rp 150.000</div>
           <div class="result-note">* Harga Perkiraan. Konfirmasi &amp; Negosiasi Via WhatsApp Untuk Harga Terbaik.</div>
           <div class="price-breakdown" id="breakdown"></div>
-          <button onclick="konfirmasiPesan()" class="wa-btn wa-btn-full" style="border:none;cursor:pointer;">
-            💬 Konfirmasi via WhatsApp
+          <button onclick="konfirmasiPesan()" class="wa-btn wa-btn-full" style="border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            Konfirmasi via WhatsApp
           </button>
         </div>
         <div class="included-box">

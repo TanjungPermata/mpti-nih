@@ -109,52 +109,54 @@
       
       function renderCustomUI(selectedIndex) {
          var selectedOpt = opsi[selectedIndex];
-         var swatches = '';
-         if (selectedOpt && selectedOpt.colors) {
-            selectedOpt.colors.forEach(function(c) {
-               swatches += '<span style="display:inline-block;width:12px;height:12px;border-radius:50%;background-color:'+c+';margin-right:4px;border:1px solid rgba(255,255,255,0.2);"></span>';
-            });
-         }
-         var label = selectedOpt ? selectedOpt.label : '';
-         var html = '<div id="customTentColorBtn" style="width:100%;background:var(--dark2);border:1px solid rgba(255,255,255,0.1);color:var(--white);padding:10px 14px;border-radius:6px;font-size:.9rem;display:flex;align-items:center;justify-content:space-between;min-height:42px;">';
-         html += '<div style="display:flex;align-items:center;">' + swatches + '<span style="margin-left:4px;">' + label + '</span></div>';
-         html += '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
-         html += '</div>';
+         var html = '<div id="colorSwatchGrid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;animation:swatchFadeIn .2s ease-out;">';
          
-         html += '<div id="customTentColorList" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--dark3);border:1px solid rgba(255,255,255,0.1);border-radius:6px;margin-top:4px;z-index:50;max-height:200px;overflow-y:auto;box-shadow:0 10px 25px rgba(0,0,0,0.5);">';
          opsi.forEach(function(opt, idx) {
-            var optSwatches = '';
+            var isSelected = idx === selectedIndex;
+            var swatchesHtml = '';
             if (opt.colors) {
                opt.colors.forEach(function(c) {
-                  optSwatches += '<span style="display:inline-block;width:12px;height:12px;border-radius:50%;background-color:'+c+';margin-right:4px;border:1px solid rgba(255,255,255,0.2);"></span>';
+                  swatchesHtml += '<div style="display:inline-block;width:32px;height:32px;border-radius:8px;background-color:'+c+';border:2px solid transparent;margin-right:4px;transition:.2s ease;"></div>';
                });
             }
-            html += '<div class="custom-tent-option" data-idx="'+idx+'" style="padding:10px 14px;display:flex;align-items:center;font-size:.9rem;transition:.2s;background:'+(idx===selectedIndex?'rgba(201,168,76,0.1)':'transparent')+';">' + optSwatches + '<span style="margin-left:4px;">' + opt.label + '</span></div>';
+            html += '<div class="color-swatch-item" data-idx="'+idx+'" style="padding:12px;border-radius:8px;background:'+(isSelected?'rgba(201,168,76,0.1)':'transparent')+';border:2px solid '+(isSelected?'var(--gold)':'rgba(201,168,76,0.2)')+';transition:all .2s ease;cursor:pointer;display:flex;flex-direction:column;align-items:center;">';
+            html += '<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;justify-content:center;">' + swatchesHtml + '</div>';
+            html += '<div style="font-size:.85rem;color:var(--text);text-align:center;font-weight:500;line-height:1.4;">' + opt.label + '</div>';
+            if (isSelected) {
+               html += '<div style="margin-top:6px;font-size:.7rem;color:var(--gold);letter-spacing:.5px;text-transform:uppercase;">✓ Dipilih</div>';
+            }
+            html += '</div>';
          });
          html += '</div>';
          
          customWarna.innerHTML = html;
          
-         document.getElementById('customTentColorBtn').onclick = function(e) {
-            e.stopPropagation();
-            var list = document.getElementById('customTentColorList');
-            list.style.display = list.style.display === 'none' ? 'block' : 'none';
-         };
+         // Update hidden input dengan nilai warna yang dipilih
+         var selectedColorInput = document.getElementById('selectedColorValue');
+         if (selectedColorInput) {
+            selectedColorInput.value = opsi[selectedIndex] ? opsi[selectedIndex].value : '';
+         }
          
-         var items = customWarna.querySelectorAll('.custom-tent-option');
+         var items = customWarna.querySelectorAll('.color-swatch-item');
          items.forEach(function(item) {
             item.onclick = function(e) {
                e.stopPropagation();
                var idx = parseInt(this.getAttribute('data-idx'));
                elWarna.selectedIndex = idx;
                renderCustomUI(idx);
-               document.getElementById('customTentColorList').style.display = 'none';
                hitungHarga();
             };
-            item.onmouseover = function() { this.style.background = 'rgba(255,255,255,0.05)'; };
+            item.onmouseover = function() { 
+               var idx = parseInt(this.getAttribute('data-idx'));
+               if (idx !== selectedIndex) {
+                  this.style.background = 'rgba(201,168,76,0.05)';
+                  this.style.borderColor = 'rgba(201,168,76,0.35)';
+               }
+            };
             item.onmouseout = function() { 
                 var idx = parseInt(this.getAttribute('data-idx'));
-                this.style.background = (idx === elWarna.selectedIndex ? 'rgba(201,168,76,0.1)' : 'transparent'); 
+                this.style.background = (idx === selectedIndex ? 'rgba(201,168,76,0.1)' : 'transparent');
+                this.style.borderColor = (idx === selectedIndex ? 'var(--gold)' : 'rgba(201,168,76,0.2)');
             };
          });
       }
@@ -163,14 +165,6 @@
       elWarna.selectedIndex = 0;
     }
   }
-
-  document.addEventListener('click', function(e) {
-      var customWarna = document.getElementById('customTentColor');
-      if (customWarna && !customWarna.contains(e.target)) {
-          var list = document.getElementById('customTentColorList');
-          if (list) list.style.display = 'none';
-      }
-  });
 
   function onTentTypeChange() {
     var elJenis = document.getElementById('tentType');
@@ -215,12 +209,23 @@
 
     var elWarna   = document.getElementById('tentColor');
     var namaWarna = (elWarna && elWarna.options.length > 0) ? elWarna.options[elWarna.selectedIndex].text : '-';
+    
+    // Ambil warna dari opsi yang dipilih untuk preview
+    var warnaPreview = '';
+    if (warnaPerTenda[jenis] && elWarna && elWarna.selectedIndex >= 0 && warnaPerTenda[jenis][elWarna.selectedIndex]) {
+      var selectedColor = warnaPerTenda[jenis][elWarna.selectedIndex];
+      if (selectedColor.colors && selectedColor.colors.length > 0) {
+        selectedColor.colors.forEach(function(color) {
+          warnaPreview += '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background-color:' + color + ';border:1px solid rgba(255,255,255,0.3);margin-right:4px;"></span>';
+        });
+      }
+    }
 
     var baris = '';
     baris += '<div class="breakdown-item"><span class="item-label">' + labelTenda[jenis] + ' × ' + unit + ' unit</span><span class="item-val">' + formatRp(totalTenda) + '</span></div>';
     baris += '<div class="breakdown-item"><span class="item-label">Ukuran: ' + labelUkuran[ukuran] + '</span><span class="item-val" style="color:var(--muted);font-size:.8rem">Informasi Ukuran</span></div>';
     if (warnaPerTenda[jenis] && warnaPerTenda[jenis].length > 0) {
-      baris += '<div class="breakdown-item"><span class="item-label">Warna: ' + namaWarna + '</span><span class="item-val" style="color:var(--muted);font-size:.8rem">Informasi Warna</span></div>';
+      baris += '<div class="breakdown-item"><span class="item-label">Warna: <span style="margin-left:4px;">' + warnaPreview + ' ' + namaWarna + '</span></span><span class="item-val" style="color:var(--muted);font-size:.8rem">Informasi Warna</span></div>';
     }
     if (tipeKursi !== 'none') {
       baris += '<div class="breakdown-item"><span class="item-label">' + labelKursi[tipeKursi] + ' × ' + kursi + ' pcs</span><span class="item-val">' + formatRp(totalKursi) + '</span></div>';
@@ -231,7 +236,8 @@
     if (tipeMeja !== 'none') {
       baris += '<div class="breakdown-item"><span class="item-label">' + labelMeja[tipeMeja] + ' × ' + meja + ' pcs</span><span class="item-val">' + formatRp(totalMeja) + '</span></div>';
     }
-    baris += '<div class="breakdown-item total"><span class="item-label">Total Estimasi</span><span class="item-val">' + formatRp(total) + '</span></div>';
+    baris += '<div style="border-top:1px solid rgba(201,168,76,0.2);margin:1rem 0;"></div>';
+    baris += '<div class="breakdown-item total" style="font-size:1.1rem;font-weight:bold;padding-top:.5rem;"><span class="item-label">Total Estimasi</span><span class="item-val">' + formatRp(total) + '</span></div>';
     
     var bd = document.getElementById('breakdown');
     if (bd) bd.innerHTML = baris;
@@ -302,7 +308,7 @@
         + (pakaiPanggung ? '- Panggung: 5x5 m\n' : '')
         + (jumlahMejaVal > 0 ? '- Meja: ' + namaMeja + ' x ' + jumlahMejaVal + ' pcs\n' : '')
         + '- Estimasi: ' + document.getElementById('totalPrice').textContent;
-      window.open('https://wa.me/6282279996174?text=' + encodeURIComponent(pesan), '_blank');
+      window.open('https://wa.me/6289622022001?text=' + encodeURIComponent(pesan), '_blank');
     });
   }
 
@@ -328,6 +334,119 @@
           if (badge) { badge.className = 'avail-status-badge full'; badge.textContent = '● Penuh'; }
         }
       });
+  }
+
+  function initKostGallery() {
+    var thumbs = Array.from(document.querySelectorAll('.gallery-thumb'));
+    var overlay = document.getElementById('kostLightbox');
+    var imageEl = document.getElementById('lightboxImage');
+    var captionEl = document.getElementById('lightboxCaption');
+    if (!overlay || !imageEl || !captionEl || !thumbs.length) return;
+
+    var items = thumbs.map(function(button) {
+      var img = button.querySelector('img');
+      return { src: img ? img.src : '', alt: img ? img.alt : '' };
+    });
+    var currentIndex = 0;
+    var touchStartX = null;
+
+    function updateLightbox(index) {
+      currentIndex = (index % items.length + items.length) % items.length;
+      var item = items[currentIndex];
+      imageEl.src = item.src;
+      imageEl.alt = item.alt;
+      captionEl.textContent = item.alt;
+      overlay.classList.add('open');
+      overlay.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+      overlay.classList.remove('open');
+      overlay.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    function showPrev() { updateLightbox(currentIndex - 1); }
+    function showNext() { updateLightbox(currentIndex + 1); }
+
+    thumbs.forEach(function(button, idx) {
+      button.addEventListener('click', function() {
+        updateLightbox(idx);
+      });
+    });
+
+    var closeBtn = overlay.querySelector('.lightbox-close');
+    var prevBtn = overlay.querySelector('.lightbox-prev');
+    var nextBtn = overlay.querySelector('.lightbox-next');
+
+    if (closeBtn) closeBtn.addEventListener('click', closeLightbox);
+    if (prevBtn) prevBtn.addEventListener('click', showPrev);
+    if (nextBtn) nextBtn.addEventListener('click', showNext);
+
+    overlay.addEventListener('click', function(e) {
+      if (e.target === overlay) closeLightbox();
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (!overlay.classList.contains('open')) return;
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowLeft') showPrev();
+      if (e.key === 'ArrowRight') showNext();
+    });
+
+    overlay.addEventListener('touchstart', function(e) {
+      touchStartX = e.changedTouches[0].clientX;
+    }, { passive: true });
+
+    overlay.addEventListener('touchend', function(e) {
+      if (touchStartX === null) return;
+      var deltaX = e.changedTouches[0].clientX - touchStartX;
+      if (Math.abs(deltaX) > 40) {
+        if (deltaX > 0) showPrev(); else showNext();
+      }
+      touchStartX = null;
+    });
+  }
+
+  function initFacilityStagger() {
+    var grid = document.querySelector('.facilities-grid');
+    if (!grid) return;
+    var items = Array.from(grid.querySelectorAll('.facility-item'));
+    if (!items.length) return;
+
+    var observer = new IntersectionObserver(function(entries, obs) {
+      entries.forEach(function(entry) {
+        if (!entry.isIntersecting) return;
+        items.forEach(function(item, idx) {
+          setTimeout(function() { item.classList.add('visible'); }, idx * 100);
+        });
+        obs.disconnect();
+      });
+    }, { threshold: 0.15 });
+
+    observer.observe(grid);
+  }
+
+  function initAdvantageCards() {
+    var cards = Array.from(document.querySelectorAll('.advantage-card'));
+    if (!cards.length) return;
+
+    var observer = new IntersectionObserver(function(entries, obs) {
+      entries.forEach(function(entry) {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('visible');
+        obs.unobserve(entry.target);
+      });
+    }, { threshold: 0.2 });
+
+    cards.forEach(function(card) { observer.observe(card); });
+  }
+
+  function initKostEnhancements() {
+    initKostGallery();
+    initFacilityStagger();
+    initAdvantageCards();
   }
 
   var dataRating = {
@@ -640,22 +759,63 @@
   }
 
   function initFAQAccordion() {
-    document.querySelectorAll('.faq-question').forEach(function(button) {
-      button.addEventListener('click', function() {
+    var questions = Array.from(document.querySelectorAll('.faq-question'));
+    var items = Array.from(document.querySelectorAll('.faq-item'));
+
+    // Initialize: ensure all answers are hidden and attributes reset
+    items.forEach(function(it) {
+      it.classList.remove('open');
+      var ans = it.querySelector('.faq-answer');
+      if (ans) {
+        ans.style.maxHeight = '0';
+        ans.style.opacity = '0';
+        ans.style.overflow = 'hidden';
+      }
+      var btn = it.querySelector('.faq-question');
+      if (btn) btn.setAttribute('aria-expanded', 'false');
+    });
+
+    questions.forEach(function(button) {
+      button.addEventListener('click', function(e) {
+        e.preventDefault();
         var item = button.closest('.faq-item');
+        if (!item) return;
         var answer = item.querySelector('.faq-answer');
-        var isOpen = item.classList.toggle('open');
-        button.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-        answer.style.maxHeight = isOpen ? answer.scrollHeight + 'px' : '0';
-        item.parentElement.querySelectorAll('.faq-item').forEach(function(other) {
+        var isOpen = item.classList.contains('open');
+
+        // Close any other open item
+        items.forEach(function(other) {
           if (other !== item) {
             other.classList.remove('open');
             var otherAnswer = other.querySelector('.faq-answer');
-            if (otherAnswer) otherAnswer.style.maxHeight = '0';
+            if (otherAnswer) {
+              otherAnswer.style.maxHeight = '0';
+              otherAnswer.style.opacity = '0';
+            }
             var otherButton = other.querySelector('.faq-question');
             if (otherButton) otherButton.setAttribute('aria-expanded', 'false');
           }
         });
+
+        if (!isOpen) {
+          // Open this item
+          item.classList.add('open');
+          button.setAttribute('aria-expanded', 'true');
+          if (answer) {
+            // set to natural height then fade in
+            answer.style.maxHeight = answer.scrollHeight + 'px';
+            // small timeout to ensure transition applies
+            setTimeout(function() { answer.style.opacity = '1'; }, 20);
+          }
+        } else {
+          // Close this item
+          item.classList.remove('open');
+          button.setAttribute('aria-expanded', 'false');
+          if (answer) {
+            answer.style.maxHeight = '0';
+            answer.style.opacity = '0';
+          }
+        }
       });
     });
   }
@@ -663,6 +823,7 @@
   function initPageEnhancements() {
     initSectionReveal();
     initFAQAccordion();
+    initKostEnhancements();
   }
 
   function initReviewObserver() {
@@ -696,30 +857,9 @@
   function toggleMenu() {
     document.getElementById('navLinks').classList.toggle('open');
   }
-  function closeMenu() {
-    var menu = document.getElementById('navLinks');
-    if (menu && menu.classList.contains('open')) {
-      menu.classList.remove('open');
-    }
-  }
-  function setAdminLoginState(isLoggedIn) {
-    document.querySelectorAll('.admin-login-toggle').forEach(function(el) {
-      el.style.display = isLoggedIn ? 'none' : 'flex';
-    });
-    document.querySelectorAll('.admin-logout-toggle').forEach(function(el) {
-      el.style.display = isLoggedIn ? 'flex' : 'none';
-    });
-  }
   document.addEventListener('click', function(e) {
     var menu = document.getElementById('navLinks'), btn = document.getElementById('hamburger');
     if (menu && btn && menu.classList.contains('open') && !menu.contains(e.target) && !btn.contains(e.target)) menu.classList.remove('open');
-  });
-
-  document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('#navLinks a, #navLinks button').forEach(function(el) {
-      if (el.id === 'hamburger') return;
-      el.addEventListener('click', function() { closeMenu(); });
-    });
   });
 
   function animasiCounter(id, target, suffix, durasi) {
@@ -764,7 +904,8 @@
         sudahLogin = true;
         localStorage.setItem('adminLoggedIn', 'true');
         tutupLogin();
-        setAdminLoginState(true);
+        document.getElementById('btnAdminLogin').style.display  = 'none';
+        document.getElementById('btnAdminLogout').style.display = 'flex';
         buatPanelAdmin();
         document.getElementById('adminPanel').classList.add('show');
       } else {
@@ -781,7 +922,8 @@
     .then(function() {
         sudahLogin = false;
         localStorage.removeItem('adminLoggedIn');
-        setAdminLoginState(false);
+        document.getElementById('btnAdminLogin').style.display  = 'flex';
+        document.getElementById('btnAdminLogout').style.display = 'none';
         document.getElementById('adminPanel').classList.remove('show');
     })
     .catch(function(err) { console.error('Logout error:', err); });
@@ -923,7 +1065,10 @@
   // Inisialisasi status admin saat halaman dimuat
   if (localStorage.getItem('adminLoggedIn') === 'true') {
       sudahLogin = true;
-      setAdminLoginState(true);
+      var btnLogin = document.getElementById('btnAdminLogin');
+      var btnPanel = document.getElementById('btnAdminLogout');
+      if (btnLogin) btnLogin.style.display = 'none';
+      if (btnPanel) btnPanel.style.display = 'flex';
       if (document.getElementById('adminPanel')) {
           buatPanelAdmin();
           document.getElementById('adminPanel').classList.add('show');

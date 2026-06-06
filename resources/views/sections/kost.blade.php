@@ -21,6 +21,7 @@
           <span class="price-amount">Rp 10.000.000</span>
           <span class="price-from">/ Tahun</span>
         </div>
+        <div class="price-note">Booking sekarang, tersedia terbatas!</div>
         <div class="facilities-grid">
           <div class="facility-item"><span style="width:24px;display:flex;justify-content:center"><i data-lucide="wifi"></i></span> WiFi Kecepatan Tinggi</div>
           <div class="facility-item"><span style="width:24px;display:flex;justify-content:center"><i data-lucide="shield-check"></i></span> Keamanan 24 Jam &amp; CCTV</div>
@@ -29,9 +30,30 @@
           <div class="facility-item"><span style="width:24px;display:flex;justify-content:center"><i data-lucide="sparkles"></i></span> Kebersihan Terjaga</div>
           <div class="facility-item"><span style="width:24px;display:flex;justify-content:center"><i data-lucide="map-pin"></i></span> Lokasi Strategis</div>
         </div>
+        <div class="advantages-section scroll-reveal">
+          <div class="section-label">KEUNGGULAN KAMI</div>
+          <h3 class="section-title-sm">Mengapa Pilih Gurau Kost?</h3>
+          <div class="advantages-grid">
+            <div class="advantage-card">
+              <div class="advantage-icon"><i data-lucide="shield-check"></i></div>
+              <h4>Terjamin Aman</h4>
+              <p>Keamanan 24 jam dengan CCTV dan petugas jaga</p>
+            </div>
+            <div class="advantage-card">
+              <div class="advantage-icon"><i data-lucide="map-pin"></i></div>
+              <h4>Lokasi Strategis</h4>
+              <p>Dekat kampus dan pusat kota Palembang</p>
+            </div>
+            <div class="advantage-card">
+              <div class="advantage-icon"><i data-lucide="star"></i></div>
+              <h4>Rating Terbaik</h4>
+              <p>4.2 bintang dari 15 ulasan Google nyata</p>
+            </div>
+          </div>
+        </div>
         <div class="gold-divider"></div>
         <div style="margin-top:1.5rem">
-          <div class="avail-label-row"><span>Cek Ketersediaan Kamar</span><span class="avail-status-badge" id="availStatusBadge">● Pilih Bulan</span></div>
+          <div class="avail-label-row"><span>Cek Ketersediaan Kamar</span><span class="avail-status-badge default" id="availStatusBadge">● Pilih Bulan</span></div>
           <div class="avail-checker">
             <select class="avail-input" id="availMonth">
               <option value="">Pilih bulan masuk...</option>
@@ -48,14 +70,28 @@
         </a>
       </div>
       <div class="kost-gallery-grid">
-        <div style="grid-row:span 2;border-radius:8px 4px 4px 8px;overflow:hidden">
+        <button type="button" class="gallery-thumb gallery-thumb-large" data-lightbox-index="0" aria-label="Buka foto 1">
           <img src="https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=600&q=80" alt="Kamar Kost Utama">
-        </div>
-        <div style="overflow:hidden;border-radius:4px">
+          <span class="gallery-overlay"><i data-lucide="zoom-in"></i></span>
+        </button>
+        <button type="button" class="gallery-thumb" data-lightbox-index="1" aria-label="Buka foto 2">
           <img src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=400&q=80" alt="Ruang Kost">
-        </div>
-        <div style="overflow:hidden;border-radius:4px 8px 8px 4px">
+          <span class="gallery-overlay"><i data-lucide="zoom-in"></i></span>
+        </button>
+        <button type="button" class="gallery-thumb" data-lightbox-index="2" aria-label="Buka foto 3">
           <img src="https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=400&q=80" alt="Fasilitas Kost">
+          <span class="gallery-overlay"><i data-lucide="zoom-in"></i></span>
+        </button>
+      </div>
+      <div class="lightbox-overlay" id="kostLightbox" aria-hidden="true">
+        <div class="lightbox-inner" role="dialog" aria-modal="true">
+          <button type="button" class="lightbox-close" aria-label="Tutup galeri"><i data-lucide="x"></i></button>
+          <button type="button" class="lightbox-nav lightbox-prev" aria-label="Foto sebelumnya"><i data-lucide="chevron-left"></i></button>
+          <div class="lightbox-content">
+            <img src="" alt="" id="lightboxImage">
+            <div class="lightbox-caption" id="lightboxCaption"></div>
+          </div>
+          <button type="button" class="lightbox-nav lightbox-next" aria-label="Foto berikutnya"><i data-lucide="chevron-right"></i></button>
         </div>
       </div>
     </div>
