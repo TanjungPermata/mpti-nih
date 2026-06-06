@@ -10,6 +10,30 @@
   var csrfToken          = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
   var dataKamar          = @json($dataKamar);
 
+  function renderThemeIcon(theme) {
+    var iconContainer = document.getElementById('themeIcon');
+    if (!iconContainer) return;
+    iconContainer.innerHTML = theme === 'light'
+      ? `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`
+      : `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79Z"/></svg>`;
+  }
+
+  function applyTheme(theme) {
+    var selected = theme === 'light' ? 'light' : 'dark';
+    document.body.classList.toggle('light-mode', selected === 'light');
+    localStorage.setItem('theme', selected);
+    renderThemeIcon(selected);
+  }
+
+  function toggleTheme() {
+    applyTheme(document.body.classList.contains('light-mode') ? 'dark' : 'light');
+  }
+
+  function initTheme() {
+    var storedTheme = localStorage.getItem('theme');
+    applyTheme(storedTheme === 'light' ? 'light' : 'dark');
+  }
+
   // ─────────────────────────────────────────────
   // DATA WARNA PER JENIS TENDA
   // ─────────────────────────────────────────────
@@ -293,12 +317,15 @@
       .then(function(res) { return res.json(); })
       .then(function(data) {
         elHasil.style.display = 'block';
+        var badge = document.getElementById('availStatusBadge');
         if (data.tersedia) {
           elHasil.className   = 'avail-result avail-yes';
           elHasil.textContent = '✓ Tersedia! ' + data.jumlahKamar + ' kamar kosong untuk ' + data.bulan + '.';
+          if (badge) { badge.className = 'avail-status-badge available'; badge.textContent = '● Tersedia'; }
         } else {
           elHasil.className   = 'avail-result avail-no';
           elHasil.textContent = '✗ Penuh untuk ' + data.bulan + '. Hubungi kami untuk daftar tunggu.';
+          if (badge) { badge.className = 'avail-status-badge full'; badge.textContent = '● Penuh'; }
         }
       });
   }
@@ -306,6 +333,25 @@
   var dataRating = {
     tenda: { nilai:4.8, total:5,  bar:{ 5:80, 4:20, 3:0, 2:0, 1:0 } },
     kost:  { nilai:4.2, total:17, bar:{ 5:Math.round(12/17*100), 4:Math.round(1/17*100), 3:Math.round(1/17*100), 2:Math.round(1/17*100), 1:Math.round(2/17*100) } }
+  };
+  var ratingAnimated = false;
+  var carouselState = {
+    wrapper: null,
+    track: null,
+    dots: null,
+    cards: [],
+    activeCount: 0,
+    cardWidth: 0,
+    setWidth: 0,
+    paused: false,
+    dragging: false,
+    startX: 0,
+    startScroll: 0,
+    frameId: null,
+    resumeTimer: null,
+    currentIndex: 0,
+    speed: 0.14,
+    initialized: false
   };
 
   function filterUlasan(kategori, tombol) {
@@ -315,37 +361,365 @@
       c.style.display = (c.dataset.cat === kategori) ? 'block' : 'none';
     });
     animasiRating(kategori);
+    setupReviewCarousel();
   }
 
   function animasiRating(kategori) {
     var data    = dataRating[kategori];
     var elAngka = document.getElementById('ratingAngka');
-    if (!elAngka) return;
-    
-    var start   = 0, target = data.nilai;
-    var timer   = setInterval(function() {
-      start += target / 30;
-      if (start >= target) { start = target; clearInterval(timer); }
-      elAngka.textContent = start.toFixed(1);
-    }, 600 / 30);
+    var elCount = document.getElementById('ratingCount');
+    var elStars = document.getElementById('ratingBintang');
+    if (!elAngka || !elCount || !elStars) return;
+
+    var target = data.nilai;
+    var countTarget = data.total;
+    var duration = 1500;
+    var startTime = null;
+
     var bintang = Math.round(data.nilai);
-    document.getElementById('ratingBintang').textContent = '★'.repeat(bintang) + '☆'.repeat(5 - bintang);
-    document.getElementById('ratingCount').textContent   = data.total + ' ulasan Google';
+    elStars.textContent = '★'.repeat(bintang) + '☆'.repeat(5 - bintang);
+
+    function step(timestamp) {
+      if (!startTime) startTime = timestamp;
+      var progress = Math.min((timestamp - startTime) / duration, 1);
+      var eased = 1 - Math.pow(1 - progress, 2);
+      elAngka.textContent = (target * eased).toFixed(1);
+      elCount.textContent = Math.floor(countTarget * eased) + ' ulasan Google';
+      if (progress < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+
     [5,4,3,2,1].forEach(function(b) {
       var elBar = document.getElementById('bar'+b), elPct = document.getElementById('pct'+b);
       if(!elBar || !elPct) return;
       var tPct  = data.bar[b] || 0;
       elBar.style.transition = 'none'; elBar.style.width = '0%'; elPct.textContent = '0%';
-      setTimeout(function() { elBar.style.transition='width 0.8s ease'; elBar.style.width=tPct+'%'; elPct.textContent=tPct+'%'; }, 150);
+      setTimeout(function() {
+        elBar.style.transition='width 1s ease-out'; elBar.style.width=tPct+'%'; elPct.textContent=tPct+'%';
+      }, 50);
     });
+  }
+
+  function buildCarouselDots(count) {
+    if (!carouselState.dots) return;
+    carouselState.dots.innerHTML = '';
+    for (var i = 0; i < count; i++) {
+      var dot = document.createElement('button');
+      dot.type = 'button';
+      dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+      dot.setAttribute('aria-label', 'Slide ' + (i + 1));
+      dot.dataset.index = i;
+      dot.addEventListener('click', function() {
+        scrollToCard(parseInt(this.dataset.index, 10));
+      });
+      carouselState.dots.appendChild(dot);
+    }
+  }
+
+  function updateCarouselDots(index) {
+    if (!carouselState.dots) return;
+    Array.from(carouselState.dots.children).forEach(function(dot, idx) {
+      dot.classList.toggle('active', idx === index);
+    });
+  }
+
+  function scrollToCard(index) {
+    var state = carouselState;
+    if (!state.wrapper || state.activeCount === 0) return;
+    index = (index % state.activeCount + state.activeCount) % state.activeCount;
+    state.currentIndex = index;
+    state.wrapper.scrollTo({ left: state.cardWidth * index, behavior: 'smooth' });
+    updateCarouselDots(index);
+    pauseAutoScroll();
+    resumeAutoScrollDelayed();
+  }
+
+  function scrollReview(direction) {
+    var state = carouselState;
+    if (!state.wrapper || state.activeCount === 0) return;
+    var index = state.currentIndex + direction;
+    if (index < 0) index = state.activeCount - 1;
+    if (index >= state.activeCount) index = 0;
+    scrollToCard(index);
+  }
+
+  function setupReviewCarousel() {
+    var wrapper = document.getElementById('reviewsScroll');
+    var track = document.getElementById('reviewsTrack');
+    var dots = document.getElementById('carouselDots');
+    if (!wrapper || !track || !dots) return;
+
+    carouselState.wrapper = wrapper;
+    carouselState.track = track;
+    carouselState.dots = dots;
+
+    track.querySelectorAll('.review-card.clone').forEach(function(clone) { clone.remove(); });
+    var originalCards = Array.from(track.querySelectorAll('.review-card')).filter(function(card) {
+      return card.dataset.clone !== 'true' && card.style.display !== 'none';
+    });
+
+    if (originalCards.length === 0) {
+      buildCarouselDots(0);
+      return;
+    }
+
+    originalCards.forEach(function(card) {
+      var clone = card.cloneNode(true);
+      clone.dataset.clone = 'true';
+      clone.classList.add('clone');
+      track.appendChild(clone);
+    });
+    originalCards.forEach(function(card) {
+      var clone = card.cloneNode(true);
+      clone.dataset.clone = 'true';
+      clone.classList.add('clone');
+      track.appendChild(clone);
+    });
+
+    carouselState.cards = originalCards;
+    carouselState.activeCount = originalCards.length;
+    carouselState.currentIndex = 0;
+    carouselState.wrapper.scrollLeft = 0;
+
+    var gap = parseFloat(getComputedStyle(track).gap || '0');
+    carouselState.cardWidth = originalCards[0].offsetWidth + gap;
+    carouselState.setWidth = carouselState.cardWidth * originalCards.length;
+
+    buildCarouselDots(carouselState.activeCount);
+    updateCarouselDots(0);
+
+    if (!carouselState.initialized) {
+      wrapper.addEventListener('mouseenter', pauseAutoScroll);
+      wrapper.addEventListener('mouseleave', resumeAutoScrollDelayed);
+      wrapper.addEventListener('pointerdown', onCarouselPointerDown);
+      wrapper.addEventListener('pointermove', onCarouselPointerMove);
+      wrapper.addEventListener('pointerup', onCarouselPointerUp);
+      wrapper.addEventListener('pointercancel', onCarouselPointerUp);
+      wrapper.addEventListener('scroll', throttle(updateCarouselIndex, 100));
+      carouselState.initialized = true;
+    }
+
+    wrapper.style.scrollBehavior = 'smooth';
+    resumeAutoScroll();
+  }
+
+  function onCarouselPointerDown(e) {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    carouselState.dragging = true;
+    carouselState.startX = e.clientX;
+    carouselState.startScroll = carouselState.wrapper.scrollLeft;
+    pauseAutoScroll();
+    try { carouselState.wrapper.setPointerCapture(e.pointerId); } catch (err) {}
+  }
+
+  function onCarouselPointerMove(e) {
+    if (!carouselState.dragging) return;
+    var delta = e.clientX - carouselState.startX;
+    carouselState.wrapper.scrollLeft = carouselState.startScroll - delta;
+    updateCarouselIndex();
+  }
+
+  function onCarouselPointerUp(e) {
+    if (!carouselState.dragging) return;
+    carouselState.dragging = false;
+    try { carouselState.wrapper.releasePointerCapture(e.pointerId); } catch (err) {}
+    resumeAutoScrollDelayed();
+  }
+
+  function pauseAutoScroll() {
+    carouselState.paused = true;
+    if (carouselState.resumeTimer) {
+      clearTimeout(carouselState.resumeTimer);
+      carouselState.resumeTimer = null;
+    }
+  }
+
+  function resumeAutoScroll() {
+    carouselState.paused = false;
+    if (!carouselState.frameId) {
+      carouselState.frameId = requestAnimationFrame(autoScrollStep);
+    }
+  }
+
+  function resumeAutoScrollDelayed() {
+    if (carouselState.resumeTimer) {
+      clearTimeout(carouselState.resumeTimer);
+    }
+    carouselState.resumeTimer = setTimeout(function() {
+      carouselState.paused = false;
+      if (!carouselState.frameId) {
+        carouselState.frameId = requestAnimationFrame(autoScrollStep);
+      }
+    }, 700);
+  }
+
+  function autoScrollStep() {
+    carouselState.frameId = null;
+    if (carouselState.paused || carouselState.dragging || !carouselState.wrapper) return;
+    carouselState.wrapper.scrollLeft += carouselState.speed;
+    if (carouselState.wrapper.scrollLeft >= carouselState.setWidth * 2) {
+      carouselState.wrapper.scrollLeft -= carouselState.setWidth;
+    }
+    updateCarouselIndex();
+    carouselState.frameId = requestAnimationFrame(autoScrollStep);
+  }
+
+  function updateCarouselIndex() {
+    if (!carouselState.wrapper || !carouselState.cardWidth || carouselState.activeCount === 0) return;
+    if (carouselState.wrapper.scrollLeft >= carouselState.setWidth * 2) {
+      carouselState.wrapper.scrollLeft -= carouselState.setWidth;
+    }
+    var index = Math.round(carouselState.wrapper.scrollLeft / carouselState.cardWidth) % carouselState.activeCount;
+    if (index < 0) index += carouselState.activeCount;
+    if (index !== carouselState.currentIndex) {
+      carouselState.currentIndex = index;
+      updateCarouselDots(index);
+    }
+  }
+
+  function initSectionReveal() {
+    var revealElements = Array.from(document.querySelectorAll('.scroll-reveal'));
+    if (!revealElements.length) return;
+
+    var lastScrollY = window.scrollY;
+    var scrollDirection = 'down';
+    window.addEventListener('scroll', function() {
+      var currentScrollY = window.scrollY;
+      if (currentScrollY > lastScrollY) {
+        scrollDirection = 'down';
+      } else if (currentScrollY < lastScrollY) {
+        scrollDirection = 'up';
+      }
+      lastScrollY = currentScrollY;
+    }, { passive: true });
+
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          entry.target.dataset.revealDirection = scrollDirection;
+          entry.target.classList.add('reveal-visible');
+          if (entry.target.querySelectorAll('.stat-value').length) {
+            entry.target.querySelectorAll('.stat-value').forEach(function(counter) {
+              delete counter.dataset.animated;
+            });
+            animateStatCounters(entry.target);
+          }
+        } else {
+          entry.target.classList.remove('reveal-visible');
+          entry.target.removeAttribute('data-reveal-direction');
+          entry.target.querySelectorAll('.stat-value').forEach(function(counter) {
+            delete counter.dataset.animated;
+          });
+        }
+      });
+    }, { threshold: 0.1 });
+
+    revealElements.forEach(function(el) { observer.observe(el); });
+  }
+
+  function animateStatCounters(root) {
+    root.querySelectorAll('.stat-value').forEach(function(counter) {
+      if (counter.dataset.animated === 'true') return;
+      counter.dataset.animated = 'true';
+      var target = parseFloat(counter.dataset.target) || 0;
+      var suffix = counter.dataset.suffix || '';
+      var duration = 1200;
+      var startTime = null;
+      var initial = 0;
+      function step(timestamp) {
+        if (!startTime) startTime = timestamp;
+        var progress = Math.min((timestamp - startTime) / duration, 1);
+        var value = initial + (target - initial) * progress;
+        counter.textContent = (target % 1 === 0 ? Math.floor(value) : value.toFixed(1)) + suffix;
+        if (progress < 1) {
+          requestAnimationFrame(step);
+        }
+      }
+      requestAnimationFrame(step);
+    });
+  }
+
+  function initFAQAccordion() {
+    document.querySelectorAll('.faq-question').forEach(function(button) {
+      button.addEventListener('click', function() {
+        var item = button.closest('.faq-item');
+        var answer = item.querySelector('.faq-answer');
+        var isOpen = item.classList.toggle('open');
+        button.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        answer.style.maxHeight = isOpen ? answer.scrollHeight + 'px' : '0';
+        item.parentElement.querySelectorAll('.faq-item').forEach(function(other) {
+          if (other !== item) {
+            other.classList.remove('open');
+            var otherAnswer = other.querySelector('.faq-answer');
+            if (otherAnswer) otherAnswer.style.maxHeight = '0';
+            var otherButton = other.querySelector('.faq-question');
+            if (otherButton) otherButton.setAttribute('aria-expanded', 'false');
+          }
+        });
+      });
+    });
+  }
+
+  function initPageEnhancements() {
+    initSectionReveal();
+    initFAQAccordion();
+  }
+
+  function initReviewObserver() {
+    var section = document.getElementById('reviews');
+    if (!section) return;
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting && !ratingAnimated) {
+          ratingAnimated = true;
+          var activeTab = document.querySelector('.tab-btn.active');
+          var current = activeTab ? activeTab.getAttribute('data-cat') : 'tenda';
+          animasiRating(current);
+          setupReviewCarousel();
+          observer.disconnect();
+        }
+      });
+    }, { threshold: 0.35 });
+    observer.observe(section);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+      initReviewObserver();
+      initPageEnhancements();
+    });
+  } else {
+    initReviewObserver();
+    initPageEnhancements();
   }
 
   function toggleMenu() {
     document.getElementById('navLinks').classList.toggle('open');
   }
+  function closeMenu() {
+    var menu = document.getElementById('navLinks');
+    if (menu && menu.classList.contains('open')) {
+      menu.classList.remove('open');
+    }
+  }
+  function setAdminLoginState(isLoggedIn) {
+    document.querySelectorAll('.admin-login-toggle').forEach(function(el) {
+      el.style.display = isLoggedIn ? 'none' : 'flex';
+    });
+    document.querySelectorAll('.admin-logout-toggle').forEach(function(el) {
+      el.style.display = isLoggedIn ? 'flex' : 'none';
+    });
+  }
   document.addEventListener('click', function(e) {
     var menu = document.getElementById('navLinks'), btn = document.getElementById('hamburger');
     if (menu && btn && menu.classList.contains('open') && !menu.contains(e.target) && !btn.contains(e.target)) menu.classList.remove('open');
+  });
+
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('#navLinks a, #navLinks button').forEach(function(el) {
+      if (el.id === 'hamburger') return;
+      el.addEventListener('click', function() { closeMenu(); });
+    });
   });
 
   function animasiCounter(id, target, suffix, durasi) {
@@ -390,8 +764,7 @@
         sudahLogin = true;
         localStorage.setItem('adminLoggedIn', 'true');
         tutupLogin();
-        document.getElementById('btnAdminLogin').style.display  = 'none';
-        document.getElementById('btnAdminLogout').style.display = 'flex';
+        setAdminLoginState(true);
         buatPanelAdmin();
         document.getElementById('adminPanel').classList.add('show');
       } else {
@@ -408,8 +781,7 @@
     .then(function() {
         sudahLogin = false;
         localStorage.removeItem('adminLoggedIn');
-        document.getElementById('btnAdminLogin').style.display  = 'flex';
-        document.getElementById('btnAdminLogout').style.display = 'none';
+        setAdminLoginState(false);
         document.getElementById('adminPanel').classList.remove('show');
     })
     .catch(function(err) { console.error('Logout error:', err); });
@@ -551,15 +923,14 @@
   // Inisialisasi status admin saat halaman dimuat
   if (localStorage.getItem('adminLoggedIn') === 'true') {
       sudahLogin = true;
-      var btnLogin = document.getElementById('btnAdminLogin');
-      var btnPanel = document.getElementById('btnAdminLogout');
-      if (btnLogin) btnLogin.style.display = 'none';
-      if (btnPanel) btnPanel.style.display = 'flex';
+      setAdminLoginState(true);
       if (document.getElementById('adminPanel')) {
           buatPanelAdmin();
           document.getElementById('adminPanel').classList.add('show');
       }
   }
+
+  initTheme();
 
   // Inisialisasi aman
   if (document.getElementById('tentType')) {
@@ -573,14 +944,6 @@
         c.style.display = (c.dataset.cat === 'tenda') ? 'block' : 'none';
       });
   }
-</script>
 
-<style>
-.history-item{padding:.75rem 0;border-bottom:1px solid rgba(255,255,255,0.04)}
-.history-item:last-child{border-bottom:none}
-.history-tanggal{font-size:.72rem;color:var(--muted);margin-bottom:.35rem}
-.history-detail{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.35rem}
-.history-detail span{font-size:.75rem;background:rgba(255,255,255,0.05);padding:2px 8px;border-radius:4px;color:var(--white)}
-.history-harga{font-size:.85rem;color:var(--gold);font-weight:500}
-</style>
+  </script>
 @endpush

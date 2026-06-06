@@ -28,10 +28,17 @@
     <li><a href="{{ route('beranda') }}#contact" class="nav-cta">Hubungi Kami</a></li>
   </ul>
   <div style="display:flex;align-items:center;gap:.5rem">
+    <button class="btn-admin theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle Theme" aria-label="Toggle theme">
+      <span id="themeIcon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79Z"/>
+        </svg>
+      </span>
+    </button>
     <button class="btn-admin" id="btnAdminLogin" onclick="bukaLogin()" title="Admin Login">ADMIN</button>
     <button class="btn-admin btn-admin-logout" id="btnAdminLogout" onclick="togglePanel()" style="display:none" title="Buka Panel"><span class="admin-indicator"></span> Panel</button>
     <button class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menu">
-      <span></span><span></span><span></span>
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg>
     </button>
   </div>
 </nav>

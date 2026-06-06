@@ -5,7 +5,7 @@
 |--------------------------------------------------------------------------
 --}}
 
-<section id="calculator" class="calculator-section">
+<section id="calculator" class="calculator-section scroll-reveal">
   <div class="container">
     <div class="section-header-row">
       <div>
@@ -131,6 +131,34 @@
             <div class="included-item">✓ Bongkar Setelah Acara</div>
             <div class="included-item">✓ Konsultasi Gratis</div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-section scroll-reveal">
+      <div class="section-label">FAQ</div>
+      <h3 class="faq-title">Pertanyaan Umum</h3>
+      <div class="faq-list">
+        <div class="faq-item">
+          <button type="button" class="faq-question" aria-expanded="false">
+            Apa minimal pemesanan tenda?
+            <span class="faq-toggle-icon">⌄</span>
+          </button>
+          <div class="faq-answer">Minimal pemesanan 1 unit untuk tenda biasa, dan 2 unit untuk tenda balon. Semua opsi disesuaikan dengan kebutuhan acara Anda.</div>
+        </div>
+        <div class="faq-item">
+          <button type="button" class="faq-question" aria-expanded="false">
+            Berapa lama waktu pemasangan sampai selesai?
+            <span class="faq-toggle-icon">⌄</span>
+          </button>
+          <div class="faq-answer">Waktu pemasangan biasanya 2-4 jam, tergantung ukuran tenda dan properti tambahan. Tim kami siap bekerja cepat dan rapi.</div>
+        </div>
+        <div class="faq-item">
+          <button type="button" class="faq-question" aria-expanded="false">
+            Apakah harga sudah termasuk bongkar pasang?
+            <span class="faq-toggle-icon">⌄</span>
+          </button>
+          <div class="faq-answer">Ya. Estimasi harga sudah termasuk pengiriman, pemasangan, dan pembongkaran setelah acara selesai.</div>
         </div>
       </div>
     </div>

@@ -10,14 +10,15 @@
   <div class="hero-pattern"></div>
   
   {{-- Decorative Elements --}}
-  <div class="hero-watermark">EST. 2004</div>
   <div class="hero-decor-line line-1"></div>
   <div class="hero-decor-line line-2"></div>
   
   <div class="hero-left">
     <div class="hero-badge"><span class="star-pulse">★</span> 4.8 Rating Google · Est. 2004</div>
     <h1>Solusi <em>Tenda</em> &amp; <em>Kost Putri</em> Premium di <em>Palembang</em></h1>
-    <p class="hero-sub">Kepercayaan masyarakat Palembang. Dari pernikahan hingga corporate event — semua kami tangani secara profesional.</p>
+    <div class="hero-sub-wrap">
+      <p class="hero-sub">Kepercayaan masyarakat Palembang. Dari pernikahan hingga corporate event — semua kami tangani secara profesional.</p>
+    </div>
     <div class="hero-btns">
       <a href="#contact" class="btn-gold">Hubungi Kami</a>
     </div>
@@ -27,6 +28,26 @@
       <div class="stat-item"><span class="stat-num" id="c2">4.2★</span><span class="stat-label">Rating Kost</span></div>
       <div class="stat-divider"></div>
       <div class="stat-item"><span class="stat-num" id="c3">20+</span><span class="stat-label">Tahun Berdiri</span></div>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="hero-photo-grid">
+      <div class="hero-photo-card hero-photo-large" style="background-image:url('https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=900&q=80');"></div>
+      <div class="hero-photo-card hero-photo-small" style="background-image:url('https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=600&q=80');"></div>
+      <div class="hero-photo-card hero-photo-small" style="background-image:url('https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=600&q=80');"></div>
+    </div>
+    <div class="hero-expertise-card">
+      <div class="hero-expertise-header">
+        <div class="hero-expertise-label">Keahlian Kami</div>
+        <div class="hero-expertise-copy">Pengalaman layanan tenda &amp; kost dalam satu tim.</div>
+      </div>
+      <div class="expertise-grid">
+        <div class="expertise-item"><span class="expertise-icon"><i data-lucide="tent"></i></span><span>Tenda</span></div>
+        <div class="expertise-item"><span class="expertise-icon"><i data-lucide="home"></i></span><span>Kost Putri</span></div>
+        <div class="expertise-item"><span class="expertise-icon"><i data-lucide="key"></i></span><span>Keamanan</span></div>
+        <div class="expertise-item"><span class="expertise-icon"><i data-lucide="globe"></i></span><span>Informasi</span></div>
+      </div>
     </div>
   </div>
 </header>

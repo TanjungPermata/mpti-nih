@@ -5,12 +5,16 @@
 |--------------------------------------------------------------------------
 --}}
 
-<section id="kost" style="background:var(--dark)">
+<section id="kost" class="scroll-reveal" style="background:var(--section-bg)">
   <div class="container">
     <div class="kost-grid">
       <div>
         <div class="section-label">Hunian Premium</div>
         <h2 class="section-title">Kost Putri Lorok Pakjo</h2>
+        <div class="kost-rating">
+          <div class="kost-stars"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
+          <div class="kost-rating-text">4.2 · 15 Ulasan</div>
+        </div>
         <p style="color:var(--muted);font-size:.9rem;line-height:1.7;margin-bottom:1.5rem">Hunian nyaman dan aman untuk perempuan di lokasi strategis Palembang. Dekat dengan kampus dan pusat kota.</p>
         <div class="price-tag">
           <span class="price-from">Mulai dari</span>
@@ -25,8 +29,9 @@
           <div class="facility-item"><span style="width:24px;display:flex;justify-content:center"><i data-lucide="sparkles"></i></span> Kebersihan Terjaga</div>
           <div class="facility-item"><span style="width:24px;display:flex;justify-content:center"><i data-lucide="map-pin"></i></span> Lokasi Strategis</div>
         </div>
+        <div class="gold-divider"></div>
         <div style="margin-top:1.5rem">
-          <div style="font-size:.8rem;color:var(--muted);margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.5px">Cek Ketersediaan Kamar</div>
+          <div class="avail-label-row"><span>Cek Ketersediaan Kamar</span><span class="avail-status-badge" id="availStatusBadge">● Pilih Bulan</span></div>
           <div class="avail-checker">
             <select class="avail-input" id="availMonth">
               <option value="">Pilih bulan masuk...</option>

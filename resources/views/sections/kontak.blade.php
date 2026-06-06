@@ -5,7 +5,7 @@
 |--------------------------------------------------------------------------
 --}}
 
-<section id="contact" style="background:var(--dark)">
+<section id="contact" class="scroll-reveal" style="background:var(--section-bg)">
   <div class="container">
     <div class="section-header-row">
       <div>
