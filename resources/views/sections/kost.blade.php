@@ -18,7 +18,7 @@
         <p style="color:var(--muted);font-size:.9rem;line-height:1.7;margin-bottom:1.5rem">Hunian nyaman dan aman untuk perempuan di lokasi strategis Palembang. Dekat dengan kampus dan pusat kota.</p>
         <div class="price-tag">
           <span class="price-from">Mulai dari</span>
-          <span class="price-amount">Rp 10.000.000</span>
+          <span class="price-amount">Rp 12.000.000</span>
           <span class="price-from">/ Tahun</span>
         </div>
         <div class="price-note">Booking sekarang, tersedia terbatas!</div>
@@ -75,11 +75,11 @@
           <span class="gallery-overlay"><i data-lucide="zoom-in"></i></span>
         </button>
         <button type="button" class="gallery-thumb" data-lightbox-index="1" aria-label="Buka foto 2">
-          <img src="/images/2.jpeg" alt=" Depan Kamar Kost">
+          <img src="/images/2.png" alt=" Depan Kamar Kost">
           <span class="gallery-overlay"><i data-lucide="zoom-in"></i></span>
         </button>
         <button type="button" class="gallery-thumb" data-lightbox-index="2" aria-label="Buka foto 3">
-          <img src="/images/3.jpeg" alt=" Dalam Kamar Kost">
+          <img src="/images/3.png" alt=" Dalam Kamar Kost">
           <span class="gallery-overlay"><i data-lucide="zoom-in"></i></span>
         </button>
         <button type="button" class="gallery-thumb" data-lightbox-index="3" aria-label="Buka foto 4">

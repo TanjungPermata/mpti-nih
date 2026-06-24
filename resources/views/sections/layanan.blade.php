@@ -27,7 +27,7 @@
         <div class="service-icon"><i data-lucide="building-2"></i></div>
         <div class="service-badge">Event Ready</div>
         <h3>Tenda Corporate / Event</h3>
-        <p>Cocok untuk peresmian kantor, pameran, dan acara semi-formal. Tersedia berbagai ukuran.</p>
+        <p>Cocok untuk peresmian kantor, dan acara semi-formal. Tersedia berbagai ukuran.</p>
         <div class="service-meta">Mulai dari Rp 250.000 / unit</div>
         <a href="#calculator" class="service-cta">Lihat Paket <span>→</span></a>
       </div>

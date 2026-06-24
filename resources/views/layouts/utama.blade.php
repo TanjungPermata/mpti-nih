@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   {{-- ─── Meta SEO ─────────────────────────────────────────────────── --}}
-  <title>Gurau Tenda | Sewa Tenda & Kost Premium Palembang</title>
+  <title>Gurau | Sewa Tenda & Kost Putri Palembang</title>
   <meta name="description" content="Sewa Tenda Palembang & Kost Lorok Pakjo berkualitas. Hubungi Gurau Tenda untuk solusi event dan hunian nyaman.">
 
   {{-- ─── CSRF Token: wajib ada untuk request POST via JavaScript ───── --}}

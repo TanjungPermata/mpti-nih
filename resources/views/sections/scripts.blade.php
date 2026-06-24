@@ -52,7 +52,7 @@
       { value: 'pink_putih',    label: 'Pink & Putih', colors: ['#FFC0CB', '#FFFFFF'] },
       { value: 'biru_putih',    label: 'Biru & Putih', colors: ['#3B82F6', '#FFFFFF'] },
       { value: 'merah_putih',   label: 'Merah & Putih', colors: ['#DC2626', '#FFFFFF'] },
-      { value: 'merah_maroon',  label: 'Merah Maroon & Putih', colors: ['#800000', '#FFFFFF'] },
+      { value: 'merah_maroon',  label: 'Merah Maroon & Gold', colors: ['#800000', '#C9A84C'] },
       { value: 'cream_putih',   label: 'Cream & Putih', colors: ['#FFFDD0', '#FFFFFF'] },
       { value: 'abu_putih_vip', label: 'Abu & Putih', colors: ['#9CA3AF', '#FFFFFF'] },
     ],

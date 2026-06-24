@@ -153,7 +153,7 @@
             Berapa lama waktu pemasangan sampai selesai?
             <span class="faq-toggle-icon">⌄</span>
           </button>
-          <div class="faq-answer">Waktu pemasangan biasanya 2-4 jam, tergantung ukuran tenda dan properti tambahan. Tim kami siap bekerja cepat dan rapi.</div>
+          <div class="faq-answer">Waktu pemasangan biasanya 4-6 jam, tergantung ukuran tenda dan properti tambahan. Tim kami siap bekerja cepat dan rapi.</div>
         </div>
         <div class="faq-item">
           <button type="button" class="faq-question" aria-expanded="false">
